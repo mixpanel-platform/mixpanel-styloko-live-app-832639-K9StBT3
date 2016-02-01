@@ -4,12 +4,46 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
-    <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
+  <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
+     <style>
+      h1 {
+          font-size: 24px;
+          margin-bottom: 20px;
+      }
+  </style>
   </head>
   <body class="mixpanel-platform-body">
-    <h1>Hello, World!</h1>
-    <script>
-      // Run queries and display results here
-    </script>
+  <center><h1>Total Count per Event in Last Day</h1></center>
+      <script>
+       MP.api.query('/api/2.0/events/names').done(function(results) {
+          var params = {
+              type: 'general',     
+              unit: 'day',        
+              interval: 1   
+          };
+          var today = new Date().toISOString().split('T')[0]
+          var eventCollection = {}
+          var requests = []
+          _.each(results, function(eventName) {
+            var d = MP.api.events(eventName, params).done(function(results) {
+                var cleanedData = {}
+                cleanedData[eventName] = {}
+                cleanedData[eventName][today] = results.values()[eventName][today]
+                _.extend(eventCollection, cleanedData)
+            }); 
+            requests.push(d)
+          });
+          
+          $.when
+            .apply($, requests)
+            .done(function(){
+              $('<div></div>').appendTo('body').MPTable({ 
+                data: eventCollection,
+                showPercentages: false,
+                firstColHeader: 'Event Name'
+              });  
+          })
+        });
+      </script>
   </body>
 </html>
