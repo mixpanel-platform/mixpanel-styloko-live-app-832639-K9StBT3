@@ -21,14 +21,14 @@
               unit: 'day',        
               interval: 1   
           };
-          var today = new Date().toISOString().split('T')[0]
+          // var today = new Date().toISOString().split('T')[0]
           var eventCollection = {}
           var requests = []
           _.each(results, function(eventName) {
             var d = MP.api.events(eventName, params).done(function(results) {
                 var cleanedData = {}
                 cleanedData[eventName] = {}
-                cleanedData[eventName][today] = results.values()[eventName][today]
+                cleanedData[eventName] = results.values()[eventName]
                 _.extend(eventCollection, cleanedData)
             }); 
             requests.push(d)
